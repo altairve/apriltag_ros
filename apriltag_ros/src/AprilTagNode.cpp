@@ -43,6 +43,31 @@
 
 // C++ Headers
 #include <image_transport/image_transport.hpp>
+Eigen::Vector3f ToEulerAngles(const Eigen::Quaterniond& q) {
+    Eigen::Vector3f angles;    //yaw pitch roll
+    const auto x = q.x();
+    const auto y = q.y();
+    const auto z = q.z();
+    const auto w = q.w();
+
+    // roll (x-axis rotation)
+    double sinr_cosp = 2 * (w * x + y * z);
+    double cosr_cosp = 1 - 2 * (x * x + y * y);
+    angles[2] = std::atan2(sinr_cosp, cosr_cosp);
+
+    // pitch (y-axis rotation)
+    double sinp = 2 * (w * y - z * x);
+    if (std::abs(sinp) >= 1)
+        angles[1] = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+    else
+        angles[1] = std::asin(sinp);
+
+    // yaw (z-axis rotation)
+    double siny_cosp = 2 * (w * z + x * y);
+    double cosy_cosp = 1 - 2 * (y * y + z * z);
+    angles[0] = std::atan2(siny_cosp, cosy_cosp);
+    return angles;
+}
 
 // create and delete functions for default tags
 #define TAG_CREATE(name) {#name, tag ## name ## _create},
@@ -209,6 +234,7 @@ void AprilTagNode::onCamera(
 
     std::vector<cv::Point3d> standaloneTagObjectPoints;
     std::vector<cv::Point2d> standaloneTagImagePoints;
+    
     double tag_half_size = (tag_sizes.count(det->id) ? tag_sizes.at(det->id) : tag_edge_size) / 2;
     addObjectPoints(tag_half_size, cv::Matx44d::eye(), standaloneTagObjectPoints);
     addImagePoints(det, standaloneTagImagePoints);
@@ -216,7 +242,21 @@ void AprilTagNode::onCamera(
       getRelativeTransform(standaloneTagObjectPoints, standaloneTagImagePoints, fx, fy, cx, cy);
     Eigen::Matrix3d rot = transform.block(0, 0, 3, 3);
     Eigen::Quaternion<double> rot_quaternion(rot);
+    rot_quaternion.normalize();
+    
+    Eigen::Vector3f rpy = ToEulerAngles(rot_quaternion);
+    
+    Eigen::Quaternionf q;
+    q = Eigen::AngleAxisf(rpy[2]+M_PI, Eigen::Vector3f::UnitX())
+    * Eigen::AngleAxisf(rpy[1], Eigen::Vector3f::UnitY())
+    * Eigen::AngleAxisf(rpy[0], Eigen::Vector3f::UnitZ());
 
+    rot_quaternion.x() = q.x();
+    rot_quaternion.y() = q.y();
+    rot_quaternion.z() = q.z();
+    rot_quaternion.w() = q.w();
+    //std::cout<<"quat = "<< rot_quaternion.x()<<","<<rot_quaternion.y()<<rot_quaternion.z()<<","<<rot_quaternion.w()<<std::endl;
+    // rot_quaternion = rot_quaternion*Eigen::AngleAxisf(90, Eigen::Vector3f::UnitY());
     geometry_msgs::msg::TransformStamped tag_pose =
       makeTagPose(transform, rot_quaternion, msg_img->header);
     // 3D orientation and position
