@@ -13,6 +13,6 @@ decimate: 0.0           # decimate resolution for quad detection
 blur: 1.0               # sigma of Gaussian blur for quad detection
 refine-edges: 1         # snap to strong gradients
 debug: 0                # write additional debugging images to current working directory
-tag_ids: [1]            # tag ID
+tag_ids: [0]            # tag ID
 tag_frames: [dock_frame]  # optional frame name
 tag_sizes: [0.021]   # optional tag-specific edge size
