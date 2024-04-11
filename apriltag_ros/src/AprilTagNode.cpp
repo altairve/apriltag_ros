@@ -196,6 +196,7 @@ void AprilTagNode::onCamera(
   const sensor_msgs::msg::Image::ConstSharedPtr & msg_img,
   const sensor_msgs::msg::CameraInfo::ConstSharedPtr & msg_ci)
 {
+std::cout<<"recevd img"<<std::endl;
   // convert to 8bit monochrome image
   const cv::Mat img_uint8 = cv_bridge::toCvShare(msg_img, "mono8")->image;
 
