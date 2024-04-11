@@ -233,6 +233,7 @@ std::cout<<"recevd img"<<std::endl;
 
     // reject detections with more corrected bits than allowed
     if (det->hamming > max_hamming) {
+    std::cout<<"reject detections with more corrected bits than allowed"<<std::endl;
       continue;
     }
 
