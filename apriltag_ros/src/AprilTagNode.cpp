@@ -221,6 +221,10 @@ void AprilTagNode::onCamera(
   apriltag_msgs::msg::AprilTagDetectionArray tag_detection_array;
   std::vector<std::string> detection_names;
   tag_detection_array.header = msg_img->header;
+  if(!zarray_size(detections))
+  {
+  	RCLCPP_WARN_THROTTLE(this->get_logger(),*this->get_clock(),1000,"No april tags found");
+  }
   //std::cout<<"size of detected array"<<zarray_size(detections)<<std::endl;
   for (int i = 0; i < zarray_size(detections); i++) {
     
