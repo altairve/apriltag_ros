@@ -199,6 +199,7 @@ void AprilTagNode::onCamera(
 std::cout<<"recevd img"<<std::endl;
   // convert to 8bit monochrome image
   const cv::Mat img_uint8 = cv_bridge::toCvShare(msg_img, "mono8")->image;
+  std::cout<<"img_uint9 = "<<img_uint9<<std::endl;
 
   image_u8_t im = {
     .width = img_uint8.cols,
@@ -220,6 +221,7 @@ std::cout<<"recevd img"<<std::endl;
   apriltag_msgs::msg::AprilTagDetectionArray tag_detection_array;
   std::vector<std::string> detection_names;
   tag_detection_array.header = msg_img->header;
+  std::cout<<"size of detected array"<<zarray_size(detections)<<std::endl;
   for (int i = 0; i < zarray_size(detections); i++) {
     apriltag_detection_t * det;
     zarray_get(detections, i, &det);
