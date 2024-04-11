@@ -227,6 +227,7 @@ std::cout<<"recevd img"<<std::endl;
     zarray_get(detections, i, &det);
     // ignore untracked tags
     if (!tag_frames.empty() && !tag_frames.count(det->id)) {
+    	std::cout<<"tag_frames empty"<<std::endl;
       continue;
     }
 
