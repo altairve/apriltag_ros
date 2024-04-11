@@ -225,6 +225,7 @@ std::cout<<"recevd img"<<std::endl;
   for (int i = 0; i < zarray_size(detections); i++) {
     apriltag_detection_t * det;
     zarray_get(detections, i, &det);
+    std::cout<<"detected id"<<det->id<<std::endl;
     // ignore untracked tags
     if (!tag_frames.empty() && !tag_frames.count(det->id)) {
     	std::cout<<"tag_frames empty"<<std::endl;
